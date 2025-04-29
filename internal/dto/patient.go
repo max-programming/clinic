@@ -14,9 +14,9 @@ type UpdatePatientRequest struct {
 	Gender       string `json:"gender"`
 	Address      string `json:"address"`
 	Phone        string `json:"phone"`
-	MedicalNotes string `json:"medical_notes"`
+	MedicalNotes string `json:"medicalNotes"`
 }
 
 type UpdatePatientNotesRequest struct {
-	MedicalNotes string `json:"medical_notes" binding:"required"`
+	MedicalNotes string `json:"medicalNotes" binding:"required"`
 }

@@ -21,18 +21,18 @@ func NewPatientHandler(service service.PatientService) *PatientHandler {
 func (h *PatientHandler) AddPatient(c *gin.Context) {
 	authUser := middleware.GetAuthUser(c)
 
-	var req dto.AddPatientRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var body dto.AddPatientRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	patient := &models.Patient{
-		Name:         req.Name,
-		Age:          req.Age,
-		Gender:       req.Gender,
-		Phone:        req.Phone,
-		Address:      req.Address,
+		Name:         body.Name,
+		Age:          body.Age,
+		Gender:       body.Gender,
+		Phone:        body.Phone,
+		Address:      body.Address,
 		MedicalNotes: "",
 		CreatedBy:    authUser.ID,
 		UpdatedBy:    authUser.ID,
@@ -75,24 +75,23 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 
 	id := c.Param("id")
 
-	var req dto.UpdatePatientRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var body dto.UpdatePatientRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	patient := &models.Patient{
-		ID:           id,
-		Name:         req.Name,
-		Age:          req.Age,
-		Gender:       req.Gender,
-		Phone:        req.Phone,
-		Address:      req.Address,
-		MedicalNotes: req.MedicalNotes,
+		Name:         body.Name,
+		Age:          body.Age,
+		Gender:       body.Gender,
+		Phone:        body.Phone,
+		Address:      body.Address,
+		MedicalNotes: body.MedicalNotes,
 		UpdatedBy:    authUser.ID,
 	}
 
-	if err := h.service.UpdatePatient(patient); err != nil {
+	if err := h.service.UpdatePatient(id, patient); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
