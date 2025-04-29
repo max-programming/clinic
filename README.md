@@ -56,6 +56,7 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=your_password
 DB_NAME=clinic
+DATABASE_URL="postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"
 JWT_SECRET=your_jwt_secret
 ```
 
