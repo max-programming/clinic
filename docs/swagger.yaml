@@ -1,0 +1,495 @@
+basePath: /api
+definitions:
+  AddPatientRequest:
+    properties:
+      address:
+        type: string
+      age:
+        maximum: 120
+        minimum: 0
+        type: integer
+      gender:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      phone:
+        type: string
+    required:
+    - age
+    - gender
+    - name
+    type: object
+  AddPatientResponse:
+    properties:
+      createdAt:
+        type: string
+      createdBy:
+        type: string
+      id:
+        type: string
+    type: object
+  DeletePatientResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  ErrorAPIResponse:
+    properties:
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  GetAllPatientsResponse:
+    properties:
+      address:
+        type: string
+      age:
+        type: integer
+      createdAt:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      medicalNotes:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  GetPatientResponse:
+    properties:
+      address:
+        type: string
+      age:
+        type: integer
+      createdAt:
+        type: string
+      createdBy:
+        $ref: '#/definitions/PatientUser'
+      gender:
+        type: string
+      id:
+        type: string
+      medicalNotes:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        $ref: '#/definitions/PatientUser'
+    type: object
+  LoginUserRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        maxLength: 20
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  LoginUserResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  PatientUser:
+    properties:
+      id:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  RegisterUserRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      role:
+        enum:
+        - receptionist
+        - doctor
+        type: string
+      username:
+        maxLength: 20
+        minLength: 3
+        type: string
+    required:
+    - password
+    - role
+    - username
+    type: object
+  RegisterUserResponse:
+    properties:
+      id:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  SuccessAPIResponse-AddPatientResponse:
+    properties:
+      data:
+        $ref: '#/definitions/AddPatientResponse'
+      success:
+        type: boolean
+    type: object
+  SuccessAPIResponse-DeletePatientResponse:
+    properties:
+      data:
+        $ref: '#/definitions/DeletePatientResponse'
+      success:
+        type: boolean
+    type: object
+  SuccessAPIResponse-GetPatientResponse:
+    properties:
+      data:
+        $ref: '#/definitions/GetPatientResponse'
+      success:
+        type: boolean
+    type: object
+  SuccessAPIResponse-LoginUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/LoginUserResponse'
+      success:
+        type: boolean
+    type: object
+  SuccessAPIResponse-RegisterUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/RegisterUserResponse'
+      success:
+        type: boolean
+    type: object
+  SuccessAPIResponse-UpdatePatientResponse:
+    properties:
+      data:
+        $ref: '#/definitions/UpdatePatientResponse'
+      success:
+        type: boolean
+    type: object
+  UpdatePatientNotesRequest:
+    properties:
+      medicalNotes:
+        type: string
+    required:
+    - medicalNotes
+    type: object
+  UpdatePatientRequest:
+    properties:
+      address:
+        type: string
+      age:
+        maximum: 120
+        minimum: 0
+        type: integer
+      gender:
+        type: string
+      medicalNotes:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      phone:
+        type: string
+    type: object
+  UpdatePatientResponse:
+    properties:
+      id:
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: API Server for a Clinic application
+  title: Clinic API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user with username and password
+      parameters:
+      - description: Login User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-LoginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      summary: Login a user
+      tags:
+      - auth
+  /patients:
+    get:
+      consumes:
+      - application/json
+      description: Get all patients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/GetAllPatientsResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all patients
+      tags:
+      - patients
+    post:
+      consumes:
+      - application/json
+      description: Add a new patient
+      parameters:
+      - description: Add Patient Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/AddPatientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-AddPatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - BearerAuth: []
+      summary: Add a new patient
+      tags:
+      - patients
+  /patients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a patient
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-DeletePatientResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a patient
+      tags:
+      - patients
+    get:
+      consumes:
+      - application/json
+      description: Get a patient by ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-GetPatientResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a patient by ID
+      tags:
+      - patients
+    put:
+      consumes:
+      - application/json
+      description: Update a patient
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Patient Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdatePatientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-UpdatePatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a patient
+      tags:
+      - patients
+  /patients/{id}/notes:
+    patch:
+      consumes:
+      - application/json
+      description: Update patient medical notes
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Patient Notes Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdatePatientNotesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-UpdatePatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - BearerAuth: []
+      summary: Update patient medical notes
+      tags:
+      - patients
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with username, password, and role
+      parameters:
+      - description: Register User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-RegisterUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      summary: Register a new user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

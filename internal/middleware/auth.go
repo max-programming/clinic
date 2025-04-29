@@ -21,13 +21,13 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Authorization header is required"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Authorization header is required"))
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Invalid authorization format"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid authorization format"))
 			return
 		}
 
@@ -35,31 +35,31 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		token, err := utils.VerifyJWT(tokenString)
 		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Invalid or expired token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid or expired token"))
 			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Invalid token claims"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid token claims"))
 			return
 		}
 
 		userID, ok := claims["userID"].(string)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Invalid user ID in token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid user ID in token"))
 			return
 		}
 
 		username, ok := claims["username"].(string)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Invalid username in token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid username in token"))
 			return
 		}
 
 		role, ok := claims["role"].(string)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ErrorResponse("Invalid role in token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid role in token"))
 			return
 		}
 
@@ -95,7 +95,7 @@ func RequireRole(roles ...string) gin.HandlerFunc {
 		allowed := slices.Contains(roles, authUser.Role)
 
 		if !allowed {
-			c.AbortWithStatusJSON(http.StatusForbidden, utils.ErrorResponse("Forbidden: insufficient permissions"))
+			c.AbortWithStatusJSON(http.StatusForbidden, utils.NewErrorAPIResponse("Forbidden: insufficient permissions"))
 			return
 		}
 

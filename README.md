@@ -83,6 +83,18 @@ JWT_SECRET=your_jwt_secret
 
 4. The server will start on port 8080.
 
+### API Documentation
+
+The API documentation is available through Swagger UI at:
+```
+http://localhost:8080/swagger/index.html
+```
+
+You can also access the raw Swagger JSON at:
+```
+http://localhost:8080/swagger/doc.json
+```
+
 ## 🔄 Database Migrations
 
 Create a new migration:

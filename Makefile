@@ -1,4 +1,4 @@
-build:
+build: swagger
 	@echo "Building clinic application..."
 	@go build -o bin/clinic ./cmd/clinic
 
@@ -6,7 +6,7 @@ run:
 	@echo "Running clinic application..."
 	@go run ./cmd/clinic
 
-dev: build
+dev: build 
 	@echo "Starting clinic application..."
 	@./bin/clinic
 
@@ -24,3 +24,6 @@ migrate-up:
 migrate-down:
 	@go run cmd/migrate/main.go down
 
+swagger:
+	@echo "Generating Swagger documentation..."
+	@swag init -g cmd/clinic/main.go --parseDependency --parseInternal
