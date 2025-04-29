@@ -9,6 +9,7 @@ type PatientService interface {
 	CreatePatient(patient *models.Patient) error
 	GetAllPatients() ([]*models.Patient, error)
 	GetPatientByID(id string) (*models.Patient, error)
+	GetPatientByIDWithUsers(id string) (*models.Patient, *models.User, *models.User, error)
 	UpdatePatient(id string, patient *models.Patient) error
 	UpdatePatientNotes(id string, notes string, updatedBy string) error
 	DeletePatient(id string) error
@@ -32,6 +33,10 @@ func (s *patientService) GetAllPatients() ([]*models.Patient, error) {
 
 func (s *patientService) GetPatientByID(id string) (*models.Patient, error) {
 	return s.repo.GetByID(id)
+}
+
+func (s *patientService) GetPatientByIDWithUsers(id string) (*models.Patient, *models.User, *models.User, error) {
+	return s.repo.GetByIDWithUsers(id)
 }
 
 func (s *patientService) UpdatePatient(id string, updatedPatient *models.Patient) error {

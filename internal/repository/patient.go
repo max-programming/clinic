@@ -9,6 +9,7 @@ type PatientRepository interface {
 	Create(patient *models.Patient) error
 	GetAll() ([]*models.Patient, error)
 	GetByID(id string) (*models.Patient, error)
+	GetByIDWithUsers(id string) (*models.Patient, *models.User, *models.User, error)
 	Update(id string, updatedPatient *models.Patient) error
 	Delete(id string) error
 }
@@ -55,4 +56,23 @@ func (r *patientRepository) Delete(id string) error {
 		return err
 	}
 	return r.db.Delete(&patient).Error
+}
+
+func (r *patientRepository) GetByIDWithUsers(id string) (*models.Patient, *models.User, *models.User, error) {
+	var patient models.Patient
+	if err := r.db.First(&patient, "id = ?", id).Error; err != nil {
+		return nil, nil, nil, err
+	}
+
+	var createdByUser models.User
+	if err := r.db.First(&createdByUser, "id = ?", patient.CreatedBy).Error; err != nil {
+		return &patient, nil, nil, err
+	}
+
+	var updatedByUser models.User
+	if err := r.db.First(&updatedByUser, "id = ?", patient.UpdatedBy).Error; err != nil {
+		return &patient, &createdByUser, nil, err
+	}
+
+	return &patient, &createdByUser, &updatedByUser, nil
 }
