@@ -27,10 +27,12 @@ func Initialize() *BootstrapApp {
 
 	authHandler := handler.NewAuthHandler(userService)
 	patientHandler := handler.NewPatientHandler(patientService)
+	healthHandler := handler.NewHealthHandler()
 
 	handlerSet := &handler.HandlerSet{
 		Auth:    authHandler,
 		Patient: patientHandler,
+		Health:  healthHandler,
 	}
 
 	return &BootstrapApp{

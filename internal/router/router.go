@@ -16,6 +16,8 @@ func SetupRouter(h *handler.HandlerSet) *gin.Engine {
 
 	api := r.Group("/api")
 	{
+		api.GET("/health", h.Health.Check)
+
 		api.POST("/register", h.Auth.Register)
 		api.POST("/login", h.Auth.Login)
 
