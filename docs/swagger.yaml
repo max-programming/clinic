@@ -185,6 +185,13 @@ definitions:
       success:
         type: boolean
     type: object
+  SuccessAPIResponse-UserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/UserResponse'
+      success:
+        type: boolean
+    type: object
   UpdatePatientNotesRequest:
     properties:
       medicalNotes:
@@ -220,12 +227,35 @@ definitions:
       updatedBy:
         type: string
     type: object
+  UserResponse:
+    properties:
+      id:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: API Server for a Clinic application
   title: Clinic API
   version: "1.0"
 paths:
+  /health:
+    get:
+      description: Returns 200 OK if the service is healthy
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check endpoint
+      tags:
+      - health
   /login:
     post:
       consumes:
@@ -258,6 +288,29 @@ paths:
           schema:
             $ref: '#/definitions/ErrorAPIResponse'
       summary: Login a user
+      tags:
+      - auth
+  /me:
+    get:
+      description: Get information about the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SuccessAPIResponse-UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorAPIResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user
       tags:
       - auth
   /patients:

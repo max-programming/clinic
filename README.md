@@ -58,6 +58,8 @@ DB_PASSWORD=your_password
 DB_NAME=clinic
 DATABASE_URL="postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"
 JWT_SECRET=your_jwt_secret
+LOCAL_ALLOWED_ORIGIN=http://localhost:5173
+REMOTE_ALLOWED_ORIGIN=http://your_remote_origin.com
 ```
 
 ### Running the Application

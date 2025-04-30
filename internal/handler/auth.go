@@ -79,3 +79,38 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.NewSuccessAPIResponse(dto.LoginUserResponse{Token: token}))
 }
+
+// @Summary Get current user
+// @Description Get information about the currently authenticated user
+// @Tags auth
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} utils.SuccessAPIResponse[dto.UserResponse]
+// @Failure 401 {object} utils.ErrorAPIResponse
+// @Failure 404 {object} utils.ErrorAPIResponse
+// @Router /me [get]
+func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Unauthorized"))
+		return
+	}
+
+	username, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Unauthorized"))
+		return
+	}
+
+	role, exists := c.Get("role")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Unauthorized"))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.NewSuccessAPIResponse(dto.UserResponse{
+		ID:       userID.(string),
+		Username: username.(string),
+		Role:     role.(string),
+	}))
+}

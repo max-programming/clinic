@@ -15,6 +15,27 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/health": {
+            "get": {
+                "description": "Returns 200 OK if the service is healthy",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Login a user with username and password",
@@ -60,6 +81,43 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorAPIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get information about the currently authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Get current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessAPIResponse-UserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorAPIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/ErrorAPIResponse"
                         }
@@ -701,6 +759,17 @@ const docTemplate = `{
                 }
             }
         },
+        "SuccessAPIResponse-UserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/UserResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "UpdatePatientNotesRequest": {
             "type": "object",
             "required": [
@@ -749,6 +818,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedBy": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
