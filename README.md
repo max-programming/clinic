@@ -102,6 +102,7 @@ Create a `.env` file in the `web` directory with the following variables:
 
 ```
 VITE_API_BASE_URL=http://localhost:8080/api
+VITE_SWAGGER_JSON_URL=http://localhost:8080/swagger/doc.json
 ```
 
 This will point the frontend to the backend API.
