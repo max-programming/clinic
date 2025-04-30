@@ -1,4 +1,4 @@
-build: swagger
+build:
 	@echo "Building clinic application..."
 	@go build -o bin/clinic ./cmd/clinic
 
@@ -6,7 +6,7 @@ run:
 	@echo "Running clinic application..."
 	@go run ./cmd/clinic
 
-dev: build 
+dev: swagger build
 	@echo "Starting clinic application..."
 	@./bin/clinic
 
