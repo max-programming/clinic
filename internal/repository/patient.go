@@ -28,7 +28,7 @@ func (r *patientRepository) Create(patient *models.Patient) error {
 
 func (r *patientRepository) GetAll() ([]*models.Patient, error) {
 	var patients []*models.Patient
-	if err := r.db.Find(&patients).Error; err != nil {
+	if err := r.db.Find(&patients).Order("created_at DESC").Error; err != nil {
 		return nil, err
 	}
 	return patients, nil
