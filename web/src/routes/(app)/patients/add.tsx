@@ -92,7 +92,6 @@ function RouteComponent() {
 
   return (
     <div className="container mx-auto py-10">
-      {/* <Breadcrumb items={[{ label: "Patients", href: "/patients" }, { label: "Add Patient" }]} /> */}
       <div className="mb-6">
         <Button variant="outline" asChild>
           <Link to="/patients">

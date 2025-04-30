@@ -1,5 +1,4 @@
 import { PatientsTable } from "@/components/patients-table";
-// import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { LogOut, PlusCircle } from "lucide-react";
@@ -41,7 +40,6 @@ function RouteComponent() {
 
   return (
     <div className="container py-10 mx-auto">
-      {/* <Breadcrumb items={[{ label: "Patients" }]} /> */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Patients</h1>
         <div className="flex gap-4">
