@@ -63,4 +63,21 @@ export const authService = {
   isAuthenticated: (): boolean => {
     return localStorage.getItem("token") !== null;
   },
+
+  hasRole: async (role: string): Promise<boolean> => {
+    try {
+      const user = await authService.getCurrentUser();
+      return user?.role === role;
+    } catch {
+      return false;
+    }
+  },
+
+  isDoctor: async (): Promise<boolean> => {
+    return authService.hasRole("doctor");
+  },
+
+  isReceptionist: async (): Promise<boolean> => {
+    return authService.hasRole("receptionist");
+  },
 };

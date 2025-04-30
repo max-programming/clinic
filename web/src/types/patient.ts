@@ -25,8 +25,8 @@ export interface AddPatientRequest {
   name: string;
   age: number;
   gender: string;
-  address: string;
-  phone: string;
+  address?: string;
+  phone?: string;
 }
 
 export interface AddPatientResponse {

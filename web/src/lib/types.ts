@@ -11,8 +11,3 @@ export type Patient = {
   createdBy: string;
   updatedBy: string;
 };
-
-export type PatientFormData = Omit<
-  Patient,
-  "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
->;

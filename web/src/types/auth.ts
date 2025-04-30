@@ -1,4 +1,3 @@
-// Base API response types that match the Go backend
 export interface ApiSuccessResponse<T> {
   success: true;
   data: T;
@@ -11,7 +10,6 @@ export interface ApiErrorResponse {
 
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
-// Request types
 export interface RegisterUserRequest {
   username: string;
   password: string;
@@ -23,7 +21,6 @@ export interface LoginUserRequest {
   password: string;
 }
 
-// Response data types
 export interface RegisterUserResponseData {
   id: string;
   username: string;

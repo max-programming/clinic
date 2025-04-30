@@ -22,8 +22,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { patientService } from "@/lib/patient-service";
+import { requireReceptionist } from "@/lib/auth-guard";
 
 export const Route = createFileRoute("/(app)/patients/add")({
+  beforeLoad: async () => {
+    return await requireReceptionist();
+  },
   component: RouteComponent,
 });
 
@@ -37,12 +41,8 @@ const formSchema = z.object({
   gender: z.enum(["Male", "Female"], {
     required_error: "Please select a gender.",
   }),
-  address: z.string().min(5, {
-    message: "Address must be at least 5 characters.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 characters.",
-  }),
+  address: z.string().optional(),
+  phone: z.string().optional(),
   medicalNotes: z.string().optional(),
 });
 

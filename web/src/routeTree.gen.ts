@@ -11,7 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
@@ -22,12 +21,6 @@ import { Route as appPatientsPatientIdNotesImport } from './routes/(app)/patient
 import { Route as appPatientsPatientIdEditImport } from './routes/(app)/patients_/$patientId/edit'
 
 // Create/Update Routes
-
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -88,13 +81,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
     '/(auth)/login': {
       id: '/(auth)/login'
       path: '/login'
@@ -151,7 +137,6 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/patients/$patientId': typeof appPatientsPatientIdRoute
@@ -163,7 +148,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/patients/$patientId': typeof appPatientsPatientIdRoute
@@ -176,7 +160,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/(app)/patients/$patientId': typeof appPatientsPatientIdRoute
@@ -190,7 +173,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
     | '/login'
     | '/register'
     | '/patients/$patientId'
@@ -201,7 +183,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
     | '/login'
     | '/register'
     | '/patients/$patientId'
@@ -212,7 +193,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/about'
     | '/(auth)/login'
     | '/(auth)/register'
     | '/(app)/patients/$patientId'
@@ -225,7 +205,6 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   appPatientsPatientIdRoute: typeof appPatientsPatientIdRoute
@@ -237,7 +216,6 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   appPatientsPatientIdRoute: appPatientsPatientIdRoute,
@@ -258,7 +236,6 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
         "/(auth)/login",
         "/(auth)/register",
         "/(app)/patients/$patientId",
@@ -270,9 +247,6 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/about": {
-      "filePath": "about.tsx"
     },
     "/(auth)/login": {
       "filePath": "(auth)/login.tsx"

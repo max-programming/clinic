@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -34,6 +34,8 @@ import {
   ArrowUp,
   ArrowUpDown,
   Edit,
+  FileEdit,
+  FileUser,
   Search,
   Trash2,
   UserRound,
@@ -44,24 +46,37 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Patient } from "@/types/patient";
-import { formatDate } from "@/lib/utils";
 import { Loading } from "@/components/ui/loading";
 import { Link } from "@tanstack/react-router";
 import { usePatients, useDeletePatient } from "@/lib/usePatients";
+import { cn, formatDate } from "@/lib/utils";
+import { authService } from "@/lib/auth-service";
+import { UserResponseData } from "@/types/auth";
 
 export function PatientsTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [patientToDelete, setPatientToDelete] = useState<string | null>(null);
-  // Default sorting by createdAt descending
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [currentUser, setCurrentUser] = useState<UserResponseData | null>(null);
 
-  // Fetch patients using React Query
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await authService.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   const { data: patients = [], isLoading } = usePatients();
 
-  // Delete patient mutation
   const deletePatientMutation = useDeletePatient();
 
   function handleDeleteClick(patientId: string) {
@@ -82,13 +97,7 @@ export function PatientsTable() {
     }
   }
 
-  // Define columns for the data table
   const columns: ColumnDef<Patient>[] = [
-    {
-      accessorKey: "id",
-      header: "ID",
-      enableSorting: false,
-    },
     {
       accessorKey: "name",
       header: ({ column }) => {
@@ -96,7 +105,10 @@ export function PatientsTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent hover:text-primary font-medium group flex items-center gap-1"
+            className={cn(
+              "p-0 hover:bg-transparent hover:text-primary font-medium group items-center gap-1",
+              !!column.getIsSorted() && "text-primary"
+            )}
           >
             Name
             {column.getIsSorted() === "asc" ? (
@@ -123,19 +135,16 @@ export function PatientsTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent hover:text-primary font-medium hidden md:inline-flex group items-center gap-1"
+            className={cn(
+              "p-0 hover:bg-transparent hover:text-primary font-medium hidden md:inline-flex group items-center gap-1",
+              !!column.getIsSorted() && "text-primary"
+            )}
           >
             Age
             {column.getIsSorted() === "asc" ? (
-              <div className="flex items-center gap-1 text-primary text-xs">
-                <ArrowUp className="h-4 w-4" />
-                <span>(Low-High)</span>
-              </div>
+              <ArrowUp className="h-4 w-4 text-primary" />
             ) : column.getIsSorted() === "desc" ? (
-              <div className="flex items-center gap-1 text-primary text-xs">
-                <ArrowDown className="h-4 w-4" />
-                <span>(High-Low)</span>
-              </div>
+              <ArrowDown className="h-4 w-4 text-primary" />
             ) : (
               <ArrowUpDown className="ml-1 h-3 w-3 opacity-50 group-hover:opacity-100" />
             )}
@@ -153,7 +162,10 @@ export function PatientsTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent hover:text-primary font-medium hidden md:inline-flex group items-center gap-1"
+            className={cn(
+              "p-0 hover:bg-transparent hover:text-primary font-medium hidden md:inline-flex group items-center gap-1",
+              !!column.getIsSorted() && "text-primary"
+            )}
           >
             Gender
             {column.getIsSorted() === "asc" ? (
@@ -181,7 +193,7 @@ export function PatientsTable() {
       header: "Address",
       enableSorting: false,
       cell: ({ row }) => {
-        const address = row.getValue<string>("address");
+        const address = row.getValue<string>("address") || "N/A";
         return (
           <div className="hidden lg:block">
             <Tooltip>
@@ -203,7 +215,7 @@ export function PatientsTable() {
       header: "Phone",
       enableSorting: false,
       cell: ({ row }) => (
-        <div className="hidden md:block">{row.getValue("phone")}</div>
+        <div className="hidden md:block">{row.getValue("phone") || "N/A"}</div>
       ),
     },
     {
@@ -211,7 +223,7 @@ export function PatientsTable() {
       header: "Medical Notes",
       enableSorting: false,
       cell: ({ row }) => {
-        const notes = row.getValue<string>("medicalNotes");
+        const notes = row.getValue<string>("medicalNotes") || "N/A";
         return (
           <div className="hidden lg:block">
             <Tooltip>
@@ -235,19 +247,16 @@ export function PatientsTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent hover:text-primary font-medium hidden lg:inline-flex group items-center gap-1"
+            className={cn(
+              "p-0 hover:bg-transparent hover:text-primary font-medium hidden lg:inline-flex group items-center gap-1",
+              !!column.getIsSorted() && "text-primary"
+            )}
           >
             Created At
             {column.getIsSorted() === "asc" ? (
-              <div className="flex items-center gap-1 text-primary text-xs">
-                <ArrowUp className="h-4 w-4" />
-                <span>(Oldest first)</span>
-              </div>
+              <ArrowUp className="h-4 w-4 text-primary" />
             ) : column.getIsSorted() === "desc" ? (
-              <div className="flex items-center gap-1 text-primary text-xs">
-                <ArrowDown className="h-4 w-4" />
-                <span>(Newest first)</span>
-              </div>
+              <ArrowDown className="h-4 w-4 text-primary" />
             ) : (
               <ArrowUpDown className="ml-1 h-3 w-3 opacity-50 group-hover:opacity-100" />
             )}
@@ -267,19 +276,16 @@ export function PatientsTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="p-0 hover:bg-transparent hover:text-primary font-medium hidden lg:inline-flex group items-center gap-1"
+            className={cn(
+              "p-0 hover:bg-transparent hover:text-primary font-medium hidden lg:inline-flex group items-center gap-1",
+              !!column.getIsSorted() && "text-primary"
+            )}
           >
             Updated At
             {column.getIsSorted() === "asc" ? (
-              <div className="flex items-center gap-1 text-primary text-xs">
-                <ArrowUp className="h-4 w-4" />
-                <span>(Oldest first)</span>
-              </div>
+              <ArrowUp className="h-4 w-4 text-primary" />
             ) : column.getIsSorted() === "desc" ? (
-              <div className="flex items-center gap-1 text-primary text-xs">
-                <ArrowDown className="h-4 w-4" />
-                <span>(Newest first)</span>
-              </div>
+              <ArrowDown className="h-4 w-4 text-primary" />
             ) : (
               <ArrowUpDown className="ml-1 h-3 w-3 opacity-50 group-hover:opacity-100" />
             )}
@@ -294,13 +300,15 @@ export function PatientsTable() {
     },
     {
       id: "actions",
-      header: () => <div className="text-right">Actions</div>,
+      header: () => <div className="text-center">Actions</div>,
       enableSorting: false,
       cell: ({ row }) => {
         const patient = row.original;
+        const isDoctor = currentUser?.role === "doctor";
+        const isReceptionist = currentUser?.role === "receptionist";
 
         return (
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -310,45 +318,80 @@ export function PatientsTable() {
                   className="hover:bg-primary/10"
                 >
                   <Link
-                    to="/patients/$patientId/edit"
+                    to="/patients/$patientId"
                     params={{ patientId: patient.id }}
                   >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
+                    <FileUser className="h-4 w-4" />
+                    <span className="sr-only">View Patient Details</span>
                   </Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Edit patient</p>
+                <p>View Patient Details</p>
               </TooltipContent>
             </Tooltip>
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-destructive/10 hover:text-destructive"
-                  onClick={e => {
-                    e.stopPropagation();
-                    handleDeleteClick(patient.id);
-                  }}
+                  asChild
+                  className="hover:bg-primary/10"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
+                  {isDoctor ? (
+                    <Link
+                      to="/patients/$patientId/notes"
+                      params={{ patientId: patient.id }}
+                    >
+                      <FileEdit className="h-4 w-4" />
+                      <span className="sr-only">Update Notes</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/patients/$patientId/edit"
+                      params={{ patientId: patient.id }}
+                      onClick={() =>
+                        localStorage.setItem("clinic_prev_page", "list")
+                      }
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit</span>
+                    </Link>
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Delete patient</p>
+                <p>{isDoctor ? "Update medical notes" : "Edit patient"}</p>
               </TooltipContent>
             </Tooltip>
+
+            {isReceptionist && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-destructive/10 hover:text-destructive"
+                    onClick={e => {
+                      e.stopPropagation();
+                      handleDeleteClick(patient.id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete patient</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         );
       },
     },
   ];
 
-  // Create the table instance
   const table = useReactTable({
     data: patients,
     columns,
@@ -385,14 +428,20 @@ export function PatientsTable() {
             />
           </div>
         </div>
-        <div className="rounded-md border overflow-hidden">
+        <div className="rounded-md border border-border overflow-hidden">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="border-collapse">
               <TableHeader>
                 {table.getHeaderGroups().map(headerGroup => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b border-border"
+                  >
                     {headerGroup.headers.map(header => (
-                      <TableHead key={header.id}>
+                      <TableHead
+                        key={header.id}
+                        className="border-r last:border-r-0 border-border font-medium bg-muted/50"
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -410,10 +459,13 @@ export function PatientsTable() {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-muted/50 transition-colors cursor-default"
+                      className="hover:bg-muted/50 transition-colors border-b border-border"
                     >
                       {row.getVisibleCells().map(cell => (
-                        <TableCell key={cell.id}>
+                        <TableCell
+                          key={cell.id}
+                          className="border-r last:border-r-0 border-border"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

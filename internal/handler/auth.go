@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/max-programming/clinic/internal/dto"
+	"github.com/max-programming/clinic/internal/middleware"
 	"github.com/max-programming/clinic/internal/models"
 	"github.com/max-programming/clinic/internal/service"
 	"github.com/max-programming/clinic/internal/utils"
@@ -90,27 +91,21 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Failure 404 {object} utils.ErrorAPIResponse
 // @Router /me [get]
 func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
-	userID, exists := c.Get("userID")
+	userObj, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Unauthorized"))
 		return
 	}
 
-	username, exists := c.Get("username")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Unauthorized"))
-		return
-	}
-
-	role, exists := c.Get("role")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Unauthorized"))
+	authUser, ok := userObj.(*middleware.AuthUser)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, utils.NewErrorAPIResponse("Invalid user type"))
 		return
 	}
 
 	c.JSON(http.StatusOK, utils.NewSuccessAPIResponse(dto.UserResponse{
-		ID:       userID.(string),
-		Username: username.(string),
-		Role:     role.(string),
+		ID:       authUser.ID,
+		Username: authUser.Username,
+		Role:     authUser.Role,
 	}))
 }

@@ -8,7 +8,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loading } from "@/components/ui/loading";
 import {
   Select,
   SelectContent,
@@ -16,18 +15,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { patientService } from "@/lib/patient-service";
-import { PatientDetail } from "@/types/patient";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Loading } from "@/components/ui/loading";
+import { usePatient, useUpdatePatient } from "@/lib/usePatients";
+import { requireReceptionist } from "@/lib/auth-guard";
+import { authService } from "@/lib/auth-service";
+
+// Define a constant for the storage key
+const PREV_PAGE_KEY = "clinic_prev_page";
 
 export const Route = createFileRoute("/(app)/patients_/$patientId/edit")({
-  component: RouteComponent,
+  beforeLoad: async () => {
+    return await requireReceptionist();
+  },
+  component: EditPatientPage,
 });
 
 const formSchema = z.object({
@@ -40,29 +46,23 @@ const formSchema = z.object({
   gender: z.enum(["Male", "Female"], {
     required_error: "Please select a gender.",
   }),
-  address: z.string().min(5, {
-    message: "Address must be at least 5 characters.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 characters.",
-  }),
+  address: z.string().optional(),
+  phone: z.string().optional(),
   medicalNotes: z.string().optional(),
 });
 
-function RouteComponent() {
+function EditPatientPage() {
   const { patientId } = Route.useParams();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [patient, setPatient] = useState<PatientDetail | null>(null);
+  const { data: patient, isLoading, isError } = usePatient(patientId);
+  const updatePatientMutation = useUpdatePatient();
   const [error, setError] = useState<string | null>(null);
-  const [isError, setIsError] = useState(false);
+  const [previousPage, setPreviousPage] = useState<string>("details");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      age: undefined,
       gender: undefined,
       address: "",
       phone: "",
@@ -71,61 +71,58 @@ function RouteComponent() {
   });
 
   useEffect(() => {
-    async function fetchPatient() {
-      try {
-        setIsLoading(true);
-        const patientData = await patientService.getPatientById(patientId);
-        setPatient(patientData);
-
-        // Set form values
-        form.reset({
-          name: patientData.name,
-          age: patientData.age,
-          gender: patientData.gender as "Male" | "Female",
-          address: patientData.address,
-          phone: patientData.phone,
-          medicalNotes: patientData.medicalNotes,
-        });
-      } catch (err) {
-        console.error("Failed to fetch patient:", err);
-        setIsError(true);
-        setError(
-          err instanceof Error ? err.message : "Failed to load patient data"
-        );
-      } finally {
-        setIsLoading(false);
-      }
+    // Get the previous page from localStorage on component mount
+    const storedPrevPage = localStorage.getItem(PREV_PAGE_KEY);
+    if (storedPrevPage === "list") {
+      setPreviousPage("list");
+    } else {
+      setPreviousPage("details");
     }
+  }, []);
 
-    fetchPatient();
-  }, [patientId, form]);
+  useEffect(() => {
+    if (patient) {
+      form.reset({
+        name: patient.name,
+        age: patient.age,
+        gender: patient.gender as "Male" | "Female",
+        address: patient.address || "",
+        phone: patient.phone || "",
+        medicalNotes: patient.medicalNotes || "",
+      });
+    }
+  }, [patient, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsSubmitting(true);
       setError(null);
-
-      await patientService.updatePatient(patientId, {
-        name: values.name,
-        age: values.age,
-        gender: values.gender,
-        address: values.address,
-        phone: values.phone,
-        medicalNotes: values.medicalNotes || "",
+      await updatePatientMutation.mutateAsync({
+        id: patientId,
+        data: values,
       });
-
       navigate({ to: "/patients/$patientId", params: { patientId } });
-    } catch (err) {
-      console.error("Failed to update patient:", err);
+    } catch (error) {
+      console.error("Failed to update patient:", error);
       setError(
-        err instanceof Error
-          ? err.message
+        error instanceof Error
+          ? error.message
           : "Failed to update patient. Please try again."
       );
-    } finally {
-      setIsSubmitting(false);
     }
   }
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate({ to: "/login" });
+  };
+
+  const handleBack = () => {
+    if (previousPage === "list") {
+      navigate({ to: "/patients" });
+    } else {
+      navigate({ to: "/patients/$patientId", params: { patientId } });
+    }
+  };
 
   if (isLoading) {
     return <Loading text="Loading patient data..." className="py-10" />;
@@ -133,11 +130,11 @@ function RouteComponent() {
 
   if (isError || !patient) {
     return (
-      <div className="container py-10 text-center">
+      <div className="container mx-auto py-10 text-center">
         <h2 className="text-2xl font-bold mb-4">Patient Not Found</h2>
         <p className="mb-6">
           The patient you're looking for doesn't exist or you don't have
-          permission to view it.
+          permission to edit it.
         </p>
         <Button asChild>
           <Link to="/patients">Back to Patients</Link>
@@ -147,18 +144,27 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container py-10">
-      <div className="mb-6">
-        <Button variant="outline" asChild>
-          <Link to="/patients/$patientId" params={{ patientId }}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Patient Details
-          </Link>
+    <div className="container py-10 mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <Button variant="outline" onClick={handleBack}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {previousPage === "list"
+            ? "Back to Patients"
+            : "Back to Patient Details"}
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
         </Button>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Edit Patient</h1>
+        <h1 className="text-3xl font-bold mb-8">Edit Patient</h1>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
@@ -175,55 +181,54 @@ function RouteComponent() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter patient name" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="age"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Age</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Enter patient age"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Gender</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Age</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
+                      <Input type="number" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Male">Male</SelectItem>
-                      <SelectItem value="Female">Female</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -232,7 +237,7 @@ function RouteComponent() {
                 <FormItem>
                   <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter patient address" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -246,10 +251,7 @@ function RouteComponent() {
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Enter patient phone number"
-                      {...field}
-                    />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -263,9 +265,8 @@ function RouteComponent() {
                 <FormItem>
                   <FormLabel>Medical Notes</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Enter medical notes"
-                      className="min-h-[150px]"
+                    <textarea
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       {...field}
                     />
                   </FormControl>
@@ -274,14 +275,12 @@ function RouteComponent() {
               )}
             />
 
-            <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/patients/$patientId" params={{ patientId }}>
-                  Cancel
-                </Link>
+            <div className="flex justify-end space-x-4">
+              <Button type="button" variant="outline" onClick={handleBack}>
+                Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={updatePatientMutation.isPending}>
+                {updatePatientMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>

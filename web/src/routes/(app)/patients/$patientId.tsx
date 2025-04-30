@@ -23,8 +23,13 @@ import { formatDate } from "@/lib/utils";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Edit, FileEdit, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { requireAuth } from "@/lib/auth-guard";
+import { useRoleAccess } from "@/hooks/use-role-access";
 
 export const Route = createFileRoute("/(app)/patients/$patientId")({
+  beforeLoad: async () => {
+    return await requireAuth();
+  },
   component: RouteComponent,
 });
 
@@ -32,6 +37,7 @@ function RouteComponent() {
   const { patientId } = Route.useParams();
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isDoctor, isReceptionist } = useRoleAccess();
 
   const { data: patient, isLoading, isError } = usePatient(patientId);
 
@@ -55,7 +61,7 @@ function RouteComponent() {
 
   if (isError || !patient) {
     return (
-      <div className="container py-10 text-center">
+      <div className="container mx-auto py-10 text-center">
         <h2 className="text-2xl font-bold mb-4">Patient Not Found</h2>
         <p className="mb-6">
           The patient you're looking for doesn't exist or you don't have
@@ -152,39 +158,51 @@ function RouteComponent() {
               Medical Notes
             </h3>
             <div className="p-4 bg-muted rounded-md whitespace-pre-wrap">
-              {patient.medicalNotes || "No medical notes available."}
+              {patient.medicalNotes || "N/A"}
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button variant="outline" asChild className="w-full sm:w-auto">
-              <Link
-                to="/patients/$patientId/edit"
-                params={{ patientId: patient.id }}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Patient
-              </Link>
-            </Button>
-            <Button variant="outline" asChild className="w-full sm:w-auto">
-              <Link
-                to="/patients/$patientId/notes"
-                params={{ patientId: patient.id }}
-              >
-                <FileEdit className="mr-2 h-4 w-4" />
-                Update Notes
-              </Link>
-            </Button>
+            {/* Edit Patient button - only visible to receptionists */}
+            {isReceptionist && (
+              <Button variant="outline" asChild className="w-full sm:w-auto">
+                <Link
+                  to="/patients/$patientId/edit"
+                  params={{ patientId: patient.id }}
+                  onClick={() =>
+                    localStorage.setItem("clinic_prev_page", "details")
+                  }
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Patient
+                </Link>
+              </Button>
+            )}
+
+            {isDoctor && (
+              <Button variant="outline" asChild className="w-full sm:w-auto">
+                <Link
+                  to="/patients/$patientId/notes"
+                  params={{ patientId: patient.id }}
+                >
+                  <FileEdit className="mr-2 h-4 w-4" />
+                  Update Notes
+                </Link>
+              </Button>
+            )}
           </div>
-          <Button
-            variant="destructive"
-            onClick={() => setDeleteDialogOpen(true)}
-            className="w-full sm:w-auto"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Patient
-          </Button>
+
+          {isReceptionist && (
+            <Button
+              variant="destructive"
+              onClick={() => setDeleteDialogOpen(true)}
+              className="w-full sm:w-auto"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Patient
+            </Button>
+          )}
         </CardFooter>
       </Card>
 

@@ -14,7 +14,6 @@ export const Route = createFileRoute("/(auth)/login")({
 });
 
 function RouteComponent() {
-  // Redirect to patients page if already authenticated
   const redirectComponent = useRedirectAuthenticated();
   if (redirectComponent) return redirectComponent;
 
