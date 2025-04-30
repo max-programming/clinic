@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -14,9 +12,6 @@ import (
 func SetupRouter(h *handler.HandlerSet) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/swagger", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
-	})
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
