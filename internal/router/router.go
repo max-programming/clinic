@@ -1,6 +1,8 @@
 package router
 
 import (
+	"log"
+
 	"github.com/gin-contrib/cors"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -14,8 +16,21 @@ import (
 func SetupRouter(h *handler.HandlerSet) *gin.Engine {
 	r := gin.Default()
 
+	origins := []string{}
+
+	if config.Envs.LocalAllowedOrigin != "" {
+		origins = append(origins, config.Envs.LocalAllowedOrigin)
+	}
+	if config.Envs.RemoteAllowedOrigin != "" {
+		origins = append(origins, config.Envs.RemoteAllowedOrigin)
+	}
+
+	if len(origins) == 0 {
+		log.Fatal("No valid CORS origins configured")
+	}
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{config.Envs.LocalAllowedOrigin, config.Envs.RemoteAllowedOrigin},
+		AllowOrigins:     origins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
