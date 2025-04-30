@@ -112,7 +112,7 @@ export function RegisterForm() {
               <FormLabel>Role</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                 </FormControl>

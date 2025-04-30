@@ -16,10 +16,15 @@ This application provides a backend service for clinic management, including:
 - **Authentication**: JWT
 - **API Framework**: Gin
 - **Database Migration**: Go-migrate
+- **Frontend**: React with TypeScript
+- **UI Framework**: TailwindCSS with Shadcn UI
+- **State Management**: TanStack React Query
+- **Routing**: TanStack Router
 
 ## 🌐 API Endpoints
 
 ### Authentication
+- `GET /api/me` - Get the authenticated user's information
 - `POST /api/register` - Register a new user (doctor or receptionist)
 - `POST /api/login` - Authenticate user and receive JWT token
 
@@ -84,6 +89,44 @@ REMOTE_ALLOWED_ORIGIN=http://your_remote_origin.com
    ```
 
 4. The server will start on port 8080.
+
+### Frontend Setup
+
+1. **Navigate to the web directory**:
+   ```bash
+   cd web
+   ```
+
+2. **Environment Variables**
+Create a `.env` file in the `web` directory with the following variables:
+
+```
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+This will point the frontend to the backend API.
+
+3. **Install dependencies**:
+   ```bash
+   bun install
+   ```
+
+4. **Start the development server**:
+   ```bash
+   bun dev
+   ```
+
+5. The frontend will be available at `http://localhost:5173`
+
+6. **Build for production**:
+   ```bash
+   bun build
+   ```
+
+7. **Preview production build**:
+   ```bash
+   bun preview
+   ```
 
 ### API Documentation
 
