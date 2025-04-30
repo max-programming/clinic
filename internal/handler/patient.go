@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/max-programming/clinic/internal/dto"
@@ -58,7 +59,7 @@ func (h *PatientHandler) AddPatient(c *gin.Context) {
 	c.JSON(http.StatusCreated, utils.NewSuccessAPIResponse(dto.AddPatientResponse{
 		ID:        patient.ID,
 		CreatedBy: authUser.Username,
-		CreatedAt: patient.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: patient.CreatedAt.Format(time.RFC3339),
 	}))
 }
 
@@ -88,8 +89,8 @@ func (h *PatientHandler) GetAllPatients(c *gin.Context) {
 			Address:      patient.Address,
 			Phone:        patient.Phone,
 			MedicalNotes: patient.MedicalNotes,
-			CreatedAt:    patient.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:    patient.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CreatedAt:    patient.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:    patient.UpdatedAt.Format(time.RFC3339),
 		}
 	}
 
@@ -144,8 +145,8 @@ func (h *PatientHandler) GetPatientByID(c *gin.Context) {
 		MedicalNotes: patient.MedicalNotes,
 		CreatedBy:    createdByResponse,
 		UpdatedBy:    updatedByResponse,
-		CreatedAt:    patient.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:    patient.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:    patient.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:    patient.UpdatedAt.Format(time.RFC3339),
 	}))
 }
 
@@ -191,7 +192,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.NewSuccessAPIResponse(dto.UpdatePatientResponse{
 		ID:        patient.ID,
 		UpdatedBy: authUser.Username,
-		UpdatedAt: patient.UpdatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: patient.UpdatedAt.Format(time.RFC3339),
 	}))
 }
 
@@ -232,7 +233,7 @@ func (h *PatientHandler) UpdatePatientNotes(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.NewSuccessAPIResponse(dto.UpdatePatientResponse{
 		ID:        patient.ID,
 		UpdatedBy: authUser.Username,
-		UpdatedAt: patient.UpdatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: patient.UpdatedAt.Format(time.RFC3339),
 	}))
 }
 

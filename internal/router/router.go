@@ -53,7 +53,7 @@ func SetupRouter(h *handler.HandlerSet) *gin.Engine {
 			patients.GET("", h.Patient.GetAllPatients)
 			patients.GET("/:id", h.Patient.GetPatientByID)
 
-			receptionistRoutes := patients.Group("/")
+			receptionistRoutes := patients.Group("")
 			receptionistRoutes.Use(middleware.RequireReceptionist())
 			{
 				receptionistRoutes.POST("", h.Patient.AddPatient)
@@ -61,7 +61,7 @@ func SetupRouter(h *handler.HandlerSet) *gin.Engine {
 				receptionistRoutes.DELETE("/:id", h.Patient.DeletePatient)
 			}
 
-			doctorRoutes := patients.Group("/")
+			doctorRoutes := patients.Group("")
 			doctorRoutes.Use(middleware.RequireDoctor())
 			{
 				doctorRoutes.PATCH("/:id/notes", h.Patient.UpdatePatientNotes)
