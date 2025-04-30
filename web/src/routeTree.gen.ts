@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SwaggerImport } from './routes/swagger'
 import { Route as IndexImport } from './routes/index'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
@@ -21,6 +22,12 @@ import { Route as appPatientsPatientIdNotesImport } from './routes/(app)/patient
 import { Route as appPatientsPatientIdEditImport } from './routes/(app)/patients_/$patientId/edit'
 
 // Create/Update Routes
+
+const SwaggerRoute = SwaggerImport.update({
+  id: '/swagger',
+  path: '/swagger',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -81,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/swagger': {
+      id: '/swagger'
+      path: '/swagger'
+      fullPath: '/swagger'
+      preLoaderRoute: typeof SwaggerImport
+      parentRoute: typeof rootRoute
+    }
     '/(auth)/login': {
       id: '/(auth)/login'
       path: '/login'
@@ -137,6 +151,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/swagger': typeof SwaggerRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/patients/$patientId': typeof appPatientsPatientIdRoute
@@ -148,6 +163,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/swagger': typeof SwaggerRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/patients/$patientId': typeof appPatientsPatientIdRoute
@@ -160,6 +176,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/swagger': typeof SwaggerRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/(app)/patients/$patientId': typeof appPatientsPatientIdRoute
@@ -173,6 +190,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/swagger'
     | '/login'
     | '/register'
     | '/patients/$patientId'
@@ -183,6 +201,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/swagger'
     | '/login'
     | '/register'
     | '/patients/$patientId'
@@ -193,6 +212,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/swagger'
     | '/(auth)/login'
     | '/(auth)/register'
     | '/(app)/patients/$patientId'
@@ -205,6 +225,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SwaggerRoute: typeof SwaggerRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   appPatientsPatientIdRoute: typeof appPatientsPatientIdRoute
@@ -216,6 +237,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SwaggerRoute: SwaggerRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   appPatientsPatientIdRoute: appPatientsPatientIdRoute,
@@ -236,6 +258,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/swagger",
         "/(auth)/login",
         "/(auth)/register",
         "/(app)/patients/$patientId",
@@ -247,6 +270,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/swagger": {
+      "filePath": "swagger.tsx"
     },
     "/(auth)/login": {
       "filePath": "(auth)/login.tsx"
