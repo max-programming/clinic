@@ -22,12 +22,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { patientService } from "@/lib/patient-service";
-import { requireReceptionist } from "@/lib/auth-guard";
 
 export const Route = createFileRoute("/(app)/patients/add")({
-  beforeLoad: async () => {
-    return await requireReceptionist();
-  },
   component: RouteComponent,
 });
 

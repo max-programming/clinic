@@ -15,13 +15,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Loading } from "@/components/ui/loading";
 import { usePatient, useUpdatePatientNotes } from "@/lib/usePatients";
-import { requireDoctor } from "@/lib/auth-guard";
 
 export const Route = createFileRoute("/(app)/patients_/$patientId/notes")({
-  beforeLoad: async () => {
-    // Only doctors can access this page
-    return await requireDoctor();
-  },
   component: UpdateNotesPage,
 });
 

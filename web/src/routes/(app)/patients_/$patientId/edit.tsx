@@ -23,16 +23,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Loading } from "@/components/ui/loading";
 import { usePatient, useUpdatePatient } from "@/lib/usePatients";
-import { requireReceptionist } from "@/lib/auth-guard";
 import { authService } from "@/lib/auth-service";
 
 // Define a constant for the storage key
 const PREV_PAGE_KEY = "clinic_prev_page";
 
 export const Route = createFileRoute("/(app)/patients_/$patientId/edit")({
-  beforeLoad: async () => {
-    return await requireReceptionist();
-  },
   component: EditPatientPage,
 });
 
