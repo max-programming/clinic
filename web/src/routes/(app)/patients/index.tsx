@@ -45,7 +45,7 @@ function RouteComponent() {
         <div className="flex gap-4">
           {isReceptionist && (
             <Button asChild>
-              <Link to="/test">
+              <Link to="/patients/add">
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Patient
               </Link>
