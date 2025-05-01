@@ -54,9 +54,9 @@ All patient endpoints require authentication.
 ### CLI Setup
 Install the CLI tools required for the project:
 
-Golang Migrate: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate#readme
-Golang Swagger: https://github.com/swaggo/swag?tab=readme-ov-file#getting-started
-Bun: https://bun.sh/docs/installation
+- Golang Migrate: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate#readme
+- Golang Swagger: https://github.com/swaggo/swag?tab=readme-ov-file#getting-started
+- Bun: https://bun.sh/docs/installation
 
 ### Environment Setup
 
