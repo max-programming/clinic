@@ -77,7 +77,7 @@ function UpdateNotesPage() {
           permission to update their notes.
         </p>
         <Button asChild>
-          <Link to="/patients">Back to Patients</Link>
+          <Link to="/">Back to Patients</Link>
         </Button>
       </div>
     );

@@ -15,7 +15,6 @@ import { Route as SwaggerImport } from './routes/swagger'
 import { Route as IndexImport } from './routes/index'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
-import { Route as appPatientsIndexImport } from './routes/(app)/patients/index'
 import { Route as appPatientsAddImport } from './routes/(app)/patients/add'
 import { Route as appPatientsPatientIdImport } from './routes/(app)/patients/$patientId'
 import { Route as appPatientsPatientIdNotesImport } from './routes/(app)/patients_/$patientId/notes'
@@ -44,12 +43,6 @@ const authRegisterRoute = authRegisterImport.update({
 const authLoginRoute = authLoginImport.update({
   id: '/(auth)/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const appPatientsIndexRoute = appPatientsIndexImport.update({
-  id: '/(app)/patients/',
-  path: '/patients/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -123,13 +116,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appPatientsAddImport
       parentRoute: typeof rootRoute
     }
-    '/(app)/patients/': {
-      id: '/(app)/patients/'
-      path: '/patients'
-      fullPath: '/patients'
-      preLoaderRoute: typeof appPatientsIndexImport
-      parentRoute: typeof rootRoute
-    }
     '/(app)/patients_/$patientId/edit': {
       id: '/(app)/patients_/$patientId/edit'
       path: '/patients/$patientId/edit'
@@ -156,7 +142,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof authRegisterRoute
   '/patients/$patientId': typeof appPatientsPatientIdRoute
   '/patients/add': typeof appPatientsAddRoute
-  '/patients': typeof appPatientsIndexRoute
   '/patients/$patientId/edit': typeof appPatientsPatientIdEditRoute
   '/patients/$patientId/notes': typeof appPatientsPatientIdNotesRoute
 }
@@ -168,7 +153,6 @@ export interface FileRoutesByTo {
   '/register': typeof authRegisterRoute
   '/patients/$patientId': typeof appPatientsPatientIdRoute
   '/patients/add': typeof appPatientsAddRoute
-  '/patients': typeof appPatientsIndexRoute
   '/patients/$patientId/edit': typeof appPatientsPatientIdEditRoute
   '/patients/$patientId/notes': typeof appPatientsPatientIdNotesRoute
 }
@@ -181,7 +165,6 @@ export interface FileRoutesById {
   '/(auth)/register': typeof authRegisterRoute
   '/(app)/patients/$patientId': typeof appPatientsPatientIdRoute
   '/(app)/patients/add': typeof appPatientsAddRoute
-  '/(app)/patients/': typeof appPatientsIndexRoute
   '/(app)/patients_/$patientId/edit': typeof appPatientsPatientIdEditRoute
   '/(app)/patients_/$patientId/notes': typeof appPatientsPatientIdNotesRoute
 }
@@ -195,7 +178,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/patients/$patientId'
     | '/patients/add'
-    | '/patients'
     | '/patients/$patientId/edit'
     | '/patients/$patientId/notes'
   fileRoutesByTo: FileRoutesByTo
@@ -206,7 +188,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/patients/$patientId'
     | '/patients/add'
-    | '/patients'
     | '/patients/$patientId/edit'
     | '/patients/$patientId/notes'
   id:
@@ -217,7 +198,6 @@ export interface FileRouteTypes {
     | '/(auth)/register'
     | '/(app)/patients/$patientId'
     | '/(app)/patients/add'
-    | '/(app)/patients/'
     | '/(app)/patients_/$patientId/edit'
     | '/(app)/patients_/$patientId/notes'
   fileRoutesById: FileRoutesById
@@ -230,7 +210,6 @@ export interface RootRouteChildren {
   authRegisterRoute: typeof authRegisterRoute
   appPatientsPatientIdRoute: typeof appPatientsPatientIdRoute
   appPatientsAddRoute: typeof appPatientsAddRoute
-  appPatientsIndexRoute: typeof appPatientsIndexRoute
   appPatientsPatientIdEditRoute: typeof appPatientsPatientIdEditRoute
   appPatientsPatientIdNotesRoute: typeof appPatientsPatientIdNotesRoute
 }
@@ -242,7 +221,6 @@ const rootRouteChildren: RootRouteChildren = {
   authRegisterRoute: authRegisterRoute,
   appPatientsPatientIdRoute: appPatientsPatientIdRoute,
   appPatientsAddRoute: appPatientsAddRoute,
-  appPatientsIndexRoute: appPatientsIndexRoute,
   appPatientsPatientIdEditRoute: appPatientsPatientIdEditRoute,
   appPatientsPatientIdNotesRoute: appPatientsPatientIdNotesRoute,
 }
@@ -263,7 +241,6 @@ export const routeTree = rootRoute
         "/(auth)/register",
         "/(app)/patients/$patientId",
         "/(app)/patients/add",
-        "/(app)/patients/",
         "/(app)/patients_/$patientId/edit",
         "/(app)/patients_/$patientId/notes"
       ]
@@ -285,9 +262,6 @@ export const routeTree = rootRoute
     },
     "/(app)/patients/add": {
       "filePath": "(app)/patients/add.tsx"
-    },
-    "/(app)/patients/": {
-      "filePath": "(app)/patients/index.tsx"
     },
     "/(app)/patients_/$patientId/edit": {
       "filePath": "(app)/patients_/$patientId/edit.tsx"

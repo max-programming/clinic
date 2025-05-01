@@ -49,7 +49,7 @@ function RouteComponent() {
     try {
       await deleteMutation.mutateAsync(patient.id);
       setDeleteDialogOpen(false);
-      navigate({ to: "/patients" });
+      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to delete patient:", error);
     }
@@ -68,7 +68,7 @@ function RouteComponent() {
           permission to view it.
         </p>
         <Button asChild>
-          <Link to="/patients">Back to Patients</Link>
+          <Link to="/">Back to Patients</Link>
         </Button>
       </div>
     );
@@ -78,7 +78,7 @@ function RouteComponent() {
     <div className="container mx-auto py-10">
       <div className="mb-6">
         <Button variant="outline" asChild>
-          <Link to="/patients">
+          <Link to="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Patients
           </Link>

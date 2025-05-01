@@ -73,7 +73,7 @@ function RouteComponent() {
         phone: values.phone,
       });
 
-      navigate({ to: "/patients" });
+      navigate({ to: "/" });
     } catch (err) {
       console.error("Failed to add patient:", err);
       setError(
@@ -90,7 +90,7 @@ function RouteComponent() {
     <div className="container mx-auto py-10">
       <div className="mb-6">
         <Button variant="outline" asChild>
-          <Link to="/patients">
+          <Link to="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Patients
           </Link>
@@ -198,7 +198,7 @@ function RouteComponent() {
 
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline" asChild>
-                <Link to="/patients">Cancel</Link>
+                <Link to="/">Cancel</Link>
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Adding..." : "Add Patient"}
