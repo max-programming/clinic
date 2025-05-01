@@ -19,7 +19,7 @@ export function useRedirectAuthenticated() {
   const isAuthenticated = authService.isAuthenticated();
 
   if (isAuthenticated) {
-    return <Navigate to="/patients" />;
+    return <Navigate to="/" />;
   }
 
   return null;
@@ -39,7 +39,7 @@ export async function requireRole(role: "doctor" | "receptionist") {
 
   if (!currentUser || currentUser.role !== role) {
     throw redirect({
-      to: "/patients",
+      to: "/",
     });
   }
 
